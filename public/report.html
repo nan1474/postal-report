@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>提交举报 - 中国邮政违规经营举报平台</title>
+    <style>
+        * {
+            margin:0;
+            padding:0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #F5F5F5;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #C9132C 0%, #A30F24 100%);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+        
+        .back-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            margin-right: 12px;
+        }
+        
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .form-container {
+            padding: 16px;
+        }
+        
+        .form-section {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        
+        .section-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-title .icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .form-item {
+            margin-bottom: 16px;
+        }
+        
+        .form-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .form-item label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .form-item .required::after {
+            content: ' *';
+            color: #C9132C;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid #E8E8E8;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s;
+            background: #FAFAFA;
+        }
+        
+        .form-input:focus {
+            border-color: #C9132C;
+            background: white;
+        }
+        
+        textarea.form-input {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .type-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .type-option {
+            padding: 14px;
+            border: 2px solid #E8E8E8;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .type-option.selected {
+            border-color: #C9132C;
+            background: #FFF5F5;
+        }
+        
+        .type-option .type-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+        }
+        
+        .type-option .type-desc {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .upload-area {
+            border: 2px dashed #E8E8E8;
+            border-radius: 12px;
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .upload-area:hover {
+            border-color: #C9132C;
+            background: #FFF5F5;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+        
+        .upload-text {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .upload-hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #C9132C 0%, #A30F24 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(201,19,44,0.3);
+            margin-top: 8px;
+        }
+        
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .notice {
+            background: #FFF8E1;
+            border-left: 4px solid #FF9800;
+            padding: 12px 14px;
+            border-radius: 0 8px 8px 0;
+            font-size: 12px;
+            color: #E65100;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .toast.show {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="back-btn" onclick="goBack()">‹</button>
+        <div class="header-title">提交举报</div>
+    </div>
+    
+    <div class="form-container">
+        <div class="form-section">
+            <div class="section-title">
+                <div class="icon" style="background: #C9132C;">📋</div>
+                举报类型
+            </div>
+            
+            <div class="type-selector" id="typeSelector">
+                <div class="type-option" onclick="selectType(this, '经营数据造假和小金库')">
+                    <div class="type-name">经营数据造假和"小金库"</div>
+                    <div class="type-desc">背离主业贸易、空转走单、虚构业务、融资性贸易、虚增收入等</div>
+                </div>
+                
+                <div class="type-option" onclick="selectType(this, '业务外包违规')">
+                    <div class="type-name">业务外包违规</div>
+                    <div class="type-desc">违反外包"十大环节"管理规范、范围、预算、采购等</div>
+                </div>
+                
+                <div class="type-option" onclick="selectType(this, '薪酬二次分配')">
+                    <div class="type-name">薪酬二次分配</div>
+                    <div class="type-desc">收回已发放薪酬、挪作他用等违规行为</div>
+                </div>
+                
+                <div class="type-option" onclick="selectType(this, '寄递业务造假及违规经营')">
+                    <div class="type-name">寄递业务造假及违规经营</div>
+                    <div class="type-desc">散户拼户、偷逃重量、个人收款、虚构理赔等</div>
+                </div>
+                
+                <div class="type-option" onclick="selectType(this, '邮务业务造假及违规经营')">
+                    <div class="type-name">邮务业务造假及违规经营</div>
+                    <div class="type-desc">邮务类业务数据造假、违规经营行为</div>
+                </div>
+                
+                <div class="type-option" onclick="selectType(this, '电商业务造假及违规经营')">
+                    <div class="type-name">电商业务造假及违规经营</div>
+                    <div class="type-desc">电商业务虚假刷单、虚增业绩等违规行为</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="section-title">
+                <div class="icon" style="background: #1976D2;">📝</div>
+                举报内容
+            </div>
+            
+            <div class="form-item">
+                <label class="required">涉及单位/部门</label>
+                <input type="text" class="form-input" id="department" placeholder="请输入涉及的单位或部门名称">
+            </div>
+            
+            <div class="form-item">
+                <label class="required">问题描述</label>
+                <textarea class="form-input" id="description" placeholder="请详细描述违规经营的具体情况，包括时间、地点、涉及人员等"></textarea>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="section-title">
+                <div class="icon" style="background: #4CAF50;">👤</div>
+                举报人信息（必填）
+            </div>
+            
+            <div class="notice">
+                ⚠️ 请如实填写您的姓名和联系电话，以便后续核实处理。我们会对举报人信息严格保密。
+            </div>
+            
+            <div class="form-item">
+                <label class="required">姓名</label>
+                <input type="text" class="form-input" id="contactName" placeholder="请输入您的真实姓名">
+            </div>
+            
+            <div class="form-item">
+                <label class="required">联系电话</label>
+                <input type="tel" class="form-input" id="contactPhone" placeholder="请输入您的联系电话">
+            </div>
+        </div>
+        
+        <button class="submit-btn" id="submitBtn" onclick="submitReport()">提交举报</button>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        // API 基础地址 - 部署后请修改为您的 Render.com 地址
+        const API_BASE = window.location.origin;
+        
+        let selectedType = '';
+        
+        // Load saved report type
+        window.onload = function() {
+            const savedType = localStorage.getItem('reportType');
+            if (savedType) {
+                const options = document.querySelectorAll('.type-option');
+                options.forEach(option => {
+                    if (option.querySelector('.type-name').textContent === savedType) {
+                        selectType(option, savedType);
+                    }
+                });
+            }
+        };
+        
+        // Select type
+        function selectType(element, type) {
+            document.querySelectorAll('.type-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedType = type;
+        }
+        
+        // Show toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+        
+        // Submit report
+        async function submitReport() {
+            if (!selectedType) {
+                alert('请选择举报类型');
+                return;
+            }
+            
+            const department = document.getElementById('department').value;
+            const description = document.getElementById('description').value;
+            const contactName = document.getElementById('contactName').value;
+            const contactPhone = document.getElementById('contactPhone').value;
+            
+            if (!department) {
+                alert('请输入涉及单位/部门');
+                return;
+            }
+            
+            if (!description) {
+                alert('请输入问题描述');
+                return;
+            }
+            
+            if (!contactName) {
+                alert('请填写您的姓名');
+                return;
+            }
+            
+            if (!contactPhone) {
+                alert('请填写您的联系电话');
+                return;
+            }
+            
+            // Validate phone
+            if (!/^1[3-9]\d{9}$/.test(contactPhone) && !/^0\d{9,11}$/.test(contactPhone)) {
+                alert('请输入正确的联系电话');
+                return;
+            }
+            
+            // Disable button
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = '提交中...';
+            
+            try {
+                const response = await fetch(API_BASE + '/api/reports', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        type: selectedType,
+                        department: department,
+                        description: description,
+                        isAnonymous: false,
+                        contactName: contactName,
+                        contactPhone: contactPhone
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Save report ID for success page
+                    localStorage.setItem('lastReportId', result.data.id);
+                    localStorage.setItem('lastReportTime', result.data.submitTime);
+                    window.location.href = 'success.html';
+                } else {
+                    alert('提交失败：' + (result.message || '未知错误'));
+                    btn.disabled = false;
+                    btn.textContent = '提交举报';
+                }
+                
+            } catch (error) {
+                console.error('Submit error:', error);
+                alert('提交失败，请检查网络连接');
+                btn.disabled = false;
+                btn.textContent = '提交举报';
+            }
+        }
+        
+        // Go back
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

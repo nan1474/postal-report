@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>中国邮政违规经营举报平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #F5F5F5;
+            min-height: 100vh;
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: #C9132C;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #C9132C 0%, #A30F24 100%);
+            padding: 24px 20px;
+            text-align: center;
+            color: white;
+        }
+        
+        .header-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.2);
+            overflow: hidden;
+        }
+        
+        .header-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0 0 6px;
+            letter-spacing: 1px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+        
+        .header .badge {
+            margin-top: 12px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 6px 16px;
+            display: inline-block;
+            font-size: 12px;
+        }
+        
+        .notice {
+            margin: 16px;
+            padding: 14px 16px;
+            background: #FFF8E1;
+            border-left: 4px solid #FF9800;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #E65100;
+            line-height: 1.6;
+        }
+        
+        .report-types {
+            padding: 0 16px 20px;
+        }
+        
+        .types-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        
+        .types-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        
+        .types-header h3 {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin: 0;
+        }
+        
+        .types-header .count {
+            font-size: 12px;
+            color: #999;
+            background: #F5F5F5;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+        
+        .type-item {
+            padding: 14px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .type-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .type-item:hover {
+            transform: scale(1.02);
+        }
+        
+        .type-item.content {
+            background: linear-gradient(135deg, #FFF5F5 0%, #FFFFFF 100%);
+            border-color: #C9132C;
+        }
+        
+        .type-item.outer {
+            background: linear-gradient(135deg, #F5F9FF 0%, #FFFFFF 100%);
+            border-color: #1976D2;
+        }
+        
+        .type-item.salary {
+            background: linear-gradient(135deg, #FFF9F5 0%, #FFFFFF 100%);
+            border-color: #FF9800;
+        }
+        
+        .type-item.express {
+            background: linear-gradient(135deg, #F5FFF5 0%, #FFFFFF 100%);
+            border-color: #4CAF50;
+        }
+        
+        .type-item.post {
+            background: linear-gradient(135deg, #F9F5FF 0%, #FFFFFF 100%);
+            border-color: #9C27B0;
+        }
+        
+        .type-item.ecommerce {
+            background: linear-gradient(135deg, #FFF5F9 0%, #FFFFFF 100%);
+            border-color: #E91E63;
+        }
+        
+        .type-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .type-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        
+        .type-item.content .type-icon { background: #C9132C; }
+        .type-item.outer .type-icon { background: #1976D2; }
+        .type-item.salary .type-icon { background: #FF9800; }
+        .type-item.express .type-icon { background: #4CAF50; }
+        .type-item.post .type-icon { background: #9C27B0; }
+        .type-item.ecommerce .type-icon { background: #E91E63; }
+        
+        .type-text {
+            flex: 1;
+        }
+        
+        .type-text h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin: 0 0 4px;
+        }
+        
+        .type-text p {
+            font-size: 12px;
+            color: #666;
+            margin: 0;
+            line-height: 1.5;
+        }
+        
+        .type-arrow {
+            font-size: 18px;
+            color: #CCC;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 24px 20px 40px;
+            color: #999;
+            font-size: 12px;
+        }
+        
+        .footer .divider-line {
+            width: 32px;
+            height: 1px;
+            background: #DDD;
+            margin: 0 auto 16px;
+        }
+        
+        .footer p {
+            margin: 0 0 4px;
+        }
+        
+        .footer .company {
+            font-weight: 500;
+            color: #666;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .toast.show {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="status-bar">
+        <span id="current-time">9:41</span>
+        <div>
+            <span style="font-size: 12px;">📶</span>
+            <span style="font-size: 12px; margin-left: 4px;">📡</span>
+            <span style="font-size: 14px; margin-left: 4px;">🔋</span>
+        </div>
+    </div>
+    
+    <div class="header">
+        <div class="header-icon" style="background: white; border-radius: 12px; padding: 8px;">
+            <img src="logo.jpg" alt="中国邮政" style="width: 100%; height: 100%; object-fit: contain;">
+        </div>
+        <h1>中国邮政</h1>
+        <p>违规经营举报平台</p>
+        <div class="badge">长治市分公司 · 清朗行动</div>
+    </div>
+    
+    <div class="notice">
+        ⚠️ 温馨提示：举报需如实填写个人信息（姓名、联系电话），以便后续核实处理。我们会对举报人信息严格保密。
+    </div>
+    
+    <div class="report-types">
+        <div class="types-card">
+            <div class="types-header">
+                <h3>请选择举报类型</h3>
+                <span class="count">共6大类</span>
+            </div>
+            
+            <div class="type-item content" onclick="goToReport('经营数据造假和小金库')">
+                <div class="type-content">
+                    <div class="type-icon">📊</div>
+                    <div class="type-text">
+                        <h4>经营数据造假和"小金库"</h4>
+                        <p>背离主业贸易、空转走单、虚构业务、融资性贸易、虚增收入等</p>
+                    </div>
+                    <span class="type-arrow">›</span>
+                </div>
+            </div>
+            
+            <div class="type-item outer" onclick="goToReport('业务外包违规')">
+                <div class="type-content">
+                    <div class="type-icon">📋</div>
+                    <div class="type-text">
+                        <h4>业务外包违规</h4>
+                        <p>违反外包"十大环节"管理规范、范围、预算、采购等</p>
+                    </div>
+                    <span class="type-arrow">›</span>
+                </div>
+            </div>
+            
+            <div class="type-item salary" onclick="goToReport('薪酬二次分配')">
+                <div class="type-content">
+                    <div class="type-icon">💰</div>
+                    <div class="type-text">
+                        <h4>薪酬二次分配</h4>
+                        <p>收回已发放薪酬、挪作他用等违规行为</p>
+                    </div>
+                    <span class="type-arrow">›</span>
+                </div>
+            </div>
+            
+            <div class="type-item express" onclick="goToReport('寄递业务造假及违规经营')">
+                <div class="type-content">
+                    <div class="type-icon">📦</div>
+                    <div class="type-text">
+                        <h4>寄递业务造假及违规经营</h4>
+                        <p>散户拼户、偷逃重量、个人收款、虚构理赔等</p>
+                    </div>
+                    <span class="type-arrow">›</span>
+                </div>
+            </div>
+            
+            <div class="type-item post" onclick="goToReport('邮务业务造假及违规经营')">
+                <div class="type-content">
+                    <div class="type-icon">📬</div>
+                    <div class="type-text">
+                        <h4>邮务业务造假及违规经营</h4>
+                        <p>邮务类业务数据造假、违规经营行为</p>
+                    </div>
+                    <span class="type-arrow">›</span>
+                </div>
+            </div>
+            
+            <div class="type-item ecommerce" onclick="goToReport('电商业务造假及违规经营')">
+                <div class="type-content">
+                    <div class="type-icon">🛒</div>
+                    <div class="type-text">
+                        <h4>电商业务造假及违规经营</h4>
+                        <p>电商业务虚假刷单、虚增业绩等违规行为</p>
+                    </div>
+                    <span class="type-arrow">›</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <div class="divider-line"></div>
+        <p class="company">中国邮政集团有限公司长治市分公司</p>
+        <p>合规经营清朗行动 · 举报热线：0355-2231668</p>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('current-time').textContent = hours + ':' + minutes;
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+        
+        // Go to report page
+        function goToReport(type) {
+            if (type) {
+                localStorage.setItem('reportType', type);
+            }
+            window.location.href = 'report.html';
+        }
+        
+        // Show toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

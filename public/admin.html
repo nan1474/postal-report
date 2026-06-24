@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 - 中国邮政违规经营举报平台</title>
+    <style>
+        * { margin:0; padding:0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif; background: #F5F5F5; min-height: 100vh; }
+        .header { background: linear-gradient(135deg, #C9132C 0%, #A30F24 100%); padding: 20px; color: white; }
+        .header h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .stat-label { font-size: 14px; color: #999; margin-bottom: 8px; }
+        .stat-value { font-size: 32px; font-weight: 700; color: #C9132C; }
+        .reports-section { padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+        .section-title { font-size: 20px; font-weight: 700; color: #1A1A1A; }
+        .filter-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+        .filter-btn { padding: 8px 16px; border: 1px solid #E8E8E8; background: white; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        .filter-btn.active { background: #C9132C; color: white; border-color: #C9132C; }
+        .reports-table { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: #F9F9F9; }
+        th { padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #666; border-bottom: 1px solid #E8E8E8; }
+        td { padding: 12px 16px; font-size: 14px; color: #333; border-bottom: 1px solid #F5F5F5; }
+        tr:hover { background: #FAFAFA; }
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .status-pending { background: #FFF9F5; color: #FF9800; }
+        .status-processing { background: #F5F9FF; color: #1976D2; }
+        .status-completed { background: #F5FFF5; color: #4CAF50; }
+        .action-btn { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; margin-right: 4px; }
+        .btn-view { background: #F5F9FF; color: #1976D2; }
+        .btn-process { background: #FFF9F5; color: #FF9800; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        .login-container { max-width: 400px; margin: 100px auto; padding: 40px; background: white; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+        .login-title { font-size: 24px; font-weight: 700; color: #1A1A1A; margin-bottom: 24px; text-align: center; }
+        .login-input { width: 100%; padding: 12px 14px; border: 1.5px solid #E8E8E8; border-radius: 10px; font-size: 15px; margin-bottom: 16px; outline: none; }
+        .login-input:focus { border-color: #C9132C; }
+        .login-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #C9132C 0%, #A30F24 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .login-btn:hover { opacity: 0.9; }
+        .loading { text-align: center; padding: 40px; color: #999; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="loginPage">
+            <div class="login-container">
+                <h1 class="login-title">管理后台登录</h1>
+                <input type="text" class="login-input" id="username" placeholder="用户名" value="admin">
+                <input type="password" class="login-input" id="password" placeholder="密码" value="123456">
+                <button class="login-btn" onclick="handleLogin()">登录</button>
+                <p style="text-align:center;margin-top:12px;font-size:12px;color:#999;">演示账号：admin / 123456</p>
+            </div>
+        </div>
+        
+        <div id="mainContent" style="display: none;">
+            <div class="header">
+                <h1>举报管理后台</h1>
+                <p>中国邮政集团有限公司长治市分公司 · 清朗行动</p>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">总举报数</div>
+                    <div class="stat-value" id="totalCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">待处理</div>
+                    <div class="stat-value" id="pendingCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">处理中</div>
+                    <div class="stat-value" id="processingCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">已完成</div>
+                    <div class="stat-value" id="completedCount">0</div>
+                </div>
+            </div>
+            
+            <div class="reports-section">
+                <div class="section-header">
+                    <h2 class="section-title">举报列表</h2>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" onclick="filterReports('all', this)">全部</button>
+                        <button class="filter-btn" onclick="filterReports('pending', this)">待处理</button>
+                        <button class="filter-btn" onclick="filterReports('processing', this)">处理中</button>
+                        <button class="filter-btn" onclick="filterReports('completed', this)">已完成</button>
+                    </div>
+                </div>
+                
+                <div class="reports-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>举报编号</th>
+                                <th>举报人</th>
+                                <th>联系电话</th>
+                                <th>举报类型</th>
+                                <th>涉及单位</th>
+                                <th>提交时间</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportsTableBody">
+                            <tr><td colspan="8" class="loading">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <div style="font-size: 64px; margin-bottom: 16px;">📭</div>
+                    <p>暂无举报数据</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = window.location.origin;
+        let isLoggedIn = false;
+        let currentFilter = 'all';
+        
+        function formatTime(isoString) {
+            const date = new Date(isoString);
+            return date.getFullYear() + '-' +
+                   (date.getMonth() + 1).toString().padStart(2, '0') + '-' +
+                   date.getDate().toString().padStart(2, '0') + ' ' +
+                   date.getHours().toString().padStart(2, '0') + ':' +
+                   date.getMinutes().toString().padStart(2, '0');
+        }
+        
+        function handleLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === 'admin' && password === '123456') {
+                isLoggedIn = true;
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                loadReports();
+                loadStats();
+            } else {
+                alert('用户名或密码错误！');
+            }
+        }
+        
+        async function loadStats() {
+            try {
+                const res = await fetch(API_BASE + '/api/stats');
+                const result = await res.json();
+                if (result.success) {
+                    document.getElementById('totalCount').textContent = result.data.total;
+                    document.getElementById('pendingCount').textContent = result.data.pending;
+                    document.getElementById('processingCount').textContent = result.data.processing;
+                    document.getElementById('completedCount').textContent = result.data.completed;
+                }
+            } catch (err) {
+                console.error('Load stats error:', err);
+            }
+        }
+        
+        async function loadReports() {
+            try {
+                const url = API_BASE + '/api/reports?status=' + currentFilter;
+                const res = await fetch(url);
+                const result = await res.json();
+                
+                if (result.success) {
+                    renderReports(result.data);
+                    updateStatsFromData(result.data);
+                } else {
+                    alert('加载数据失败');
+                }
+            } catch (err) {
+                console.error('Load reports error:', err);
+                document.getElementById('reportsTableBody').innerHTML = 
+                    '<tr><td colspan="8" style="text-align:center;color:#999;padding:40px;">加载失败，请刷新重试</td></tr>';
+            }
+        }
+        
+        function renderReports(reports) {
+            const tbody = document.getElementById('reportsTableBody');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (reports.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            tbody.innerHTML = '';
+            
+            reports.forEach(report => {
+                const tr = document.createElement('tr');
+                
+                let statusText = '';
+                let statusClass = '';
+                if (report.status === 'pending') {
+                    statusText = '待处理';
+                    statusClass = 'status-pending';
+                } else if (report.status === 'processing') {
+                    statusText = '处理中';
+                    statusClass = 'status-processing';
+                } else {
+                    statusText = '已完成';
+                    statusClass = 'status-completed';
+                }
+                
+                tr.innerHTML = `
+                    <td style="font-weight: 500;">${report.id}</td>
+                    <td>${report.contactName || '-'}</td>
+                    <td>${report.contactPhone || '-'}</td>
+                    <td>${report.type}</td>
+                    <td>${report.department}</td>
+                    <td>${formatTime(report.submitTime)}</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="action-btn btn-view" onclick="viewReport('${report.id}')">查看</button>
+                        <button class="action-btn btn-process" onclick="processReport('${report.id}')">处理</button>
+                    </td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+        }
+        
+        function updateStatsFromData(reports) {
+            // Only update if we're showing all
+            if (currentFilter === 'all') {
+                loadStats();
+            }
+        }
+        
+        function filterReports(filter, btn) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            loadReports();
+        }
+        
+        async function viewReport(id) {
+            try {
+                const res = await fetch(API_BASE + '/api/reports/' + id);
+                const result = await res.json();
+                
+                if (result.success && result.data) {
+                    const report = result.data;
+                    let statusText = '';
+                    if (report.status === 'pending') statusText = '待处理';
+                    else if (report.status === 'processing') statusText = '处理中';
+                    else statusText = '已完成';
+                    
+                    let info = `举报详情\n\n`;
+                    info += `举报编号：${report.id}\n`;
+                    info += `举报人：${report.contactName || '未填写'}\n`;
+                    info += `联系电话：${report.contactPhone || '未填写'}\n`;
+                    info += `举报类型：${report.type}\n`;
+                    info += `涉及单位：${report.department}\n`;
+                    info += `提交时间：${formatTime(report.submitTime)}\n`;
+                    info += `处理状态：${statusText}\n\n`;
+                    info += `问题描述：\n${report.description}\n\n`;
+                    
+                    if (report.processLogs && report.processLogs.length > 0) {
+                        info += `处理记录：\n`;
+                        report.processLogs.forEach((log, index) => {
+                            info += `${index + 1}. ${formatTime(log.time)} - ${log.comment}\n`;
+                        });
+                    }
+                    
+                    alert(info);
+                }
+            } catch (err) {
+                alert('加载详情失败');
+            }
+        }
+        
+        async function processReport(id) {
+            const newStatus = prompt(`处理举报 ${id}\n\n输入新状态：\n- pending (待处理)\n- processing (处理中)\n- completed (已完成)\n\n或直接输入处理意见：`);
+            
+            if (!newStatus) return;
+            
+            let status = newStatus;
+            let comment = newStatus;
+            
+            // If input is a valid status, use it
+            if (['pending', 'processing', 'completed'].includes(newStatus)) {
+                comment = '状态更新为：' + (newStatus === 'pending' ? '待处理' : newStatus === 'processing' ? '处理中' : '已完成');
+            }
+            
+            try {
+                const res = await fetch(API_BASE + '/api/reports/' + id + '/status', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: status, comment: comment })
+                });
+                
+                const result = await res.json();
+                
+                if (result.success) {
+                    alert('处理成功！');
+                    loadReports();
+                    loadStats();
+                } else {
+                    alert('处理失败：' + (result.message || '未知错误'));
+                }
+            } catch (err) {
+                console.error('Process error:', err);
+                alert('处理失败，请检查网络连接');
+            }
+        }
+        
+        // Allow Enter key to trigger login
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleLogin();
+            }
+        });
+    </script>
+</body>
+</html>

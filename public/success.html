@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>提交成功 - 中国邮政违规经营举报平台</title>
+    <style>
+        * {
+            margin:0;
+            padding:0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #F5F5F5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .success-container {
+            text-align: center;
+            max-width: 375px;
+            width: 100%;
+        }
+        
+        .success-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            margin: 0 auto 32px;
+            box-shadow: 0 8px 24px rgba(76, 175, 80, 0.3);
+            animation: scaleIn 0.5s ease-out;
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .success-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 12px;
+        }
+        
+        .success-message {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+        
+        .info-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            text-align: left;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #F5F5F5;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-size: 14px;
+            color: #999;
+        }
+        
+        .info-value {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .info-value.number {
+            color: #C9132C;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #C9132C 0%, #A30F24 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(201,19,44,0.3);
+        }
+        
+        .btn-secondary {
+            width: 100%;
+            padding: 15px;
+            background: white;
+            color: #C9132C;
+            border: 2px solid #C9132C;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-icon">✅</div>
+        
+        <h1 class="success-title">提交成功！</h1>
+        <p class="success-message">
+            感谢您的举报，我们将尽快<br>
+            处理您的反馈信息。
+        </p>
+        
+        <div class="info-card">
+            <div class="info-item">
+                <span class="info-label">举报编号</span>
+                <span class="info-value number" id="reportNumber">-</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">举报人</span>
+                <span class="info-value" id="contactName">-</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">联系电话</span>
+                <span class="info-value" id="contactPhone">-</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">提交时间</span>
+                <span class="info-value" id="submitTime">-</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">处理状态</span>
+                <span class="info-value" style="color: #FF9800;">待审核</span>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn-primary" onclick="goHome()">返回首页</button>
+            <button class="btn-secondary" onclick="viewProgress()">查询进度</button>
+        </div>
+        
+        <div class="footer">
+            <p>中国邮政集团有限公司长治市分公司</p>
+            <p>合规经营清朗行动</p>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = window.location.origin;
+        
+        function formatTime(isoString) {
+            const date = new Date(isoString);
+            return date.getFullYear() + '-' +
+                   (date.getMonth() + 1).toString().padStart(2, '0') + '-' +
+                   date.getDate().toString().padStart(2, '0') + ' ' +
+                   date.getHours().toString().padStart(2, '0') + ':' +
+                   date.getMinutes().toString().padStart(2, '0');
+        }
+        
+        window.onload = function() {
+            const reportId = localStorage.getItem('lastReportId');
+            
+            if (reportId) {
+                document.getElementById('reportNumber').textContent = reportId;
+                
+                // Try to fetch report details from API
+                fetch(API_BASE + '/api/reports/' + reportId)
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.success && result.data) {
+                            const report = result.data;
+                            document.getElementById('contactName').textContent = report.contactName || '-';
+                            document.getElementById('contactPhone').textContent = report.contactPhone || '-';
+                            document.getElementById('submitTime').textContent = formatTime(report.submitTime);
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Failed to load report:', err);
+                    });
+            }
+        };
+        
+        function goHome() {
+            window.location.href = 'index.html';
+        }
+        
+        function viewProgress() {
+            const number = document.getElementById('reportNumber').textContent;
+            alert('举报进度查询\n\n举报编号：' + number + 
+                  '\n当前状态：待审核' + 
+                  '\n\n（您可以通过此编号随时查询处理进度）');
+        }
+    </script>
+</body>
+</html>
